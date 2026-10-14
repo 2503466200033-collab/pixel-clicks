@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXEL.CLICKS — Professional Photography</title>
+  
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- iOS Design System Variables --- */
+    :root {
+      --ios-bg: #000000;
+      --ios-card-bg: rgba(255, 255, 255, 0.08);
+      --ios-blur: blur(25px);
+      --ios-border: rgba(255, 255, 255, 0.15);
+      --ios-accent: #0A84FF;
+      --ios-text: #FFFFFF;
+      --ios-secondary-text: rgba(255, 255, 255, 0.6);
+      --ios-radius: 24px;
+      --ios-transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--ios-bg);
+      color: var(--ios-text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Ambient Background Glows */
+    .ambient-blur-1, .ambient-blur-2 {
+      position: fixed;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: 0;
+      opacity: 0.5;
+      animation: float 10s infinite alternate ease-in-out;
+    }
+
+    .ambient-blur-1 {
+      top: -50px;
+      left: -50px;
+      background: linear-gradient(135deg, #FF375F, #5E5CE6);
+    }
+
+    .ambient-blur-2 {
+      bottom: -50px;
+      right: -50px;
+      background: linear-gradient(135deg, #0A84FF, #64D2FF);
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, 40px) scale(1.1); }
+    }
+
+    /* --- App Container --- */
+    .app-viewport {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      max-height: 932px;
+      background: rgba(18, 18, 18, 0.65);
+      backdrop-filter: var(--ios-blur);
+      -webkit-backdrop-filter: var(--ios-blur);
+      border: 1px solid var(--ios-border);
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic Island Header */
+    .ios-header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .brand-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .icon-btn {
+      background: var(--ios-card-bg);
+      border: 1px solid var(--ios-border);
+      color: var(--ios-text);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--ios-transition);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* --- View Navigation Logic --- */
+    .view {
+      position: absolute;
+      top: 70px;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      padding: 0 20px;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.95) translateY(20px);
+      transition: var(--ios-transition);
+      scrollbar-width: none;
+    }
+
+    .view::-webkit-scrollbar {
+      display: none;
+    }
+
+    .view.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) translateY(0);
+    }
+
+    /* --- Login View --- */
+    .login-card {
+      background: var(--ios-card-bg);
+      border: 1px solid var(--ios-border);
+      border-radius: var(--ios-radius);
+      padding: 30px 20px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .login-card h2 {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      color: var(--ios-secondary-text);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    .ios-input-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .ios-input-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--ios-secondary-text);
+      margin-left: 12px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .ios-input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--ios-border);
+      color: var(--ios-text);
+      font-size: 1rem;
+      outline: none;
+      transition: var(--ios-transition);
+    }
+
+    .ios-input:focus {
+      border-color: var(--ios-accent);
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .ios-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: var(--ios-accent);
+      color: #FFF;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--ios-transition);
+      margin-top: 10px;
+    }
+
+    .ios-btn:active {
+      transform: scale(0.97);
+      opacity: 0.8;
+    }
+
+    /* --- Photography Portfolio Cards --- */
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 15px 0 15px 5px;
+    }
+
+    .shoot-card {
+      position: relative;
+      background: var(--ios-card-bg);
+      border-radius: var(--ios-radius);
+      border: 1px solid var(--ios-border);
+      overflow: hidden;
+      margin-bottom: 20px;
+      transition: var(--ios-transition);
+    }
+
+    .shoot-card:active {
+      transform: scale(0.98);
+    }
+
+    .shoot-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .shoot-info {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .shoot-info h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .shoot-info p {
+      font-size: 0.85rem;
+      color: var(--ios-secondary-text);
+    }
+
+    .select-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid var(--ios-border);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* --- Booking Modal & Form --- */
+    .booking-summary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--ios-border);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .contact-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(10, 132, 255, 0.15);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+    }
+
+    /* --- QR Modal Overlay --- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--ios-transition);
+      z-index: 100;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: rgba(30, 30, 30, 0.9);
+      border: 1px solid var(--ios-border);
+      border-radius: 30px;
+      padding: 25px;
+      width: 85%;
+      max-width: 340px;
+      text-align: center;
+      transform: scale(0.8);
+      transition: var(--ios-transition);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .qr-container {
+      background: #FFF;
+      padding: 12px;
+      border-radius: 20px;
+      margin: 15px 0;
+      display: inline-block;
+    }
+
+    .qr-container img {
+      width: 200px;
+      height: 200px;
+      border-radius: 12px;
+      display: block;
+    }
+
+    /* --- Bottom iOS Navigation Bar --- */
+    .ios-tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: rgba(20, 20, 20, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--ios-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--ios-secondary-text);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: var(--ios-transition);
+      width: 33%;
+    }
+
+    .tab-item i {
+      font-size: 1.2rem;
+    }
+
+    .tab-item.active {
+      color: var(--ios-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient background glow elements -->
+  <div class="ambient-blur-1"></div>
+  <div class="ambient-blur-2"></div>
+
+  <!-- iOS Main Container -->
+  <div class="app-viewport">
+    
+    <!-- Top Bar -->
+    <div class="ios-header">
+      <span class="brand-logo">PIXEL.CLICKS</span>
+      <button class="icon-btn" onclick="openQRModal()" title="View Instagram QR">
+        <i class="fa-solid fa-qrcode"></i>
+      </button>
+    </div>
+
+    <!-- 1. LOGIN VIEW -->
+    <div id="view-login" class="view active">
+      <div class="login-card">
+        <i class="fa-solid fa-camera-retro" style="font-size: 2.5rem; color: var(--ios-accent); margin-bottom: 10px;"></i>
+        <h2>Welcome to Pixel.Clicks</h2>
+        <p>Sign in to explore & book professional shoots</p>
+        
+        <form onsubmit="handleLogin(event)">
+          <div class="ios-input-group">
+            <label>Name</label>
+            <input type="text" class="ios-input" id="login-name" placeholder="John Doe" required>
+          </div>
+          <div class="ios-input-group">
+            <label>Email</label>
+            <input type="email" class="ios-input" id="login-email" placeholder="john@example.com" required>
+          </div>
+          <button type="submit" class="ios-btn">Continue</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. GALLERY / SHOOTS VIEW -->
+    <div id="view-gallery" class="view">
+      <h2 class="section-title">Select Photography Shoot</h2>
+
+      <div class="shoot-card">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" class="shoot-img" alt="Wedding Photography">
+        <div class="shoot-info">
+          <div>
+            <h3>Wedding & Event Shoot</h3>
+            <p>Cinematic coverage & portraits</p>
+          </div>
+          <button class="select-btn" onclick="selectShoot('Wedding & Event Shoot')">Select</button>
+        </div>
+      </div>
+
+      <div class="shoot-card">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" class="shoot-img" alt="Portrait Photography">
+        <div class="shoot-info">
+          <div>
+            <h3>Portrait & Model Shoot</h3>
+            <p>Studio & Outdoor creative session</p>
+          </div>
+          <button class="select-btn" onclick="selectShoot('Portrait & Model Shoot')">Select</button>
+        </div>
+      </div>
+
+      <div class="shoot-card">
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80" class="shoot-img" alt="Commercial Photography">
+        <div class="shoot-info">
+          <div>
+            <h3>Product & Commercial Shoot</h3>
+            <p>High-end branding & catalog images</p>
+          </div>
+          <button class="select-btn" onclick="selectShoot('Product & Commercial Shoot')">Select</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. BOOKING / DETAILS VIEW -->
+    <div id="view-booking" class="view">
+      <h2 class="section-title">Shoot Details</h2>
+      
+      <div class="contact-badge">
+        <i class="fa-solid fa-circle-info" style="color: var(--ios-accent);"></i>
+        <span>Direct contact: pj1925110@gmail.com | +91 8320645326</span>
+      </div>
+
+      <div class="booking-summary">
+        <p style="font-size:0.8rem; color: var(--ios-secondary-text);">Selected Package:</p>
+        <h3 id="selected-shoot-display" style="color: var(--ios-accent);">No shoot selected</h3>
+      </div>
+
+      <form onsubmit="handleBookingSubmit(event)">
+        <div class="ios-input-group">
+          <label>Your Name</label>
+          <input type="text" class="ios-input" id="book-name" required>
+        </div>
+
+        <div class="ios-input-group">
+          <label>Preferred Date & Location</label>
+          <input type="text" class="ios-input" id="book-details" placeholder="e.g., 25th Nov, Mumbai Beach Studio" required>
+        </div>
+
+        <div class="ios-input-group">
+          <label>Additional Notes / Details</label>
+          <textarea class="ios-input" id="book-notes" rows="3" placeholder="Tell us specific themes, timings, or styling needs..."></textarea>
+        </div>
+
+        <button type="submit" class="ios-btn">Send Booking Details via Email</button>
+        <button type="button" class="ios-btn" onclick="sendWhatsApp()" style="background: #25D366; margin-top: 10px;">
+          <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp
+        </button>
+      </form>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="ios-tab-bar">
+      <div class="tab-item active" id="tab-login" onclick="switchTab('login')">
+        <i class="fa-solid fa-user"></i>
+        <span>Login</span>
+      </div>
+      <div class="tab-item" id="tab-gallery" onclick="switchTab('gallery')">
+        <i class="fa-solid fa-images"></i>
+        <span>Shoots</span>
+      </div>
+      <div class="tab-item" id="tab-booking" onclick="switchTab('booking')">
+        <i class="fa-solid fa-calendar-check"></i>
+        <span>Booking</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal Component -->
+  <div class="modal-overlay" id="qr-modal" onclick="closeQRModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h3>Connect on Instagram</h3>
+      <p style="font-size: 0.8rem; color: var(--ios-secondary-text); margin-top: 5px;">Scan to view @PIXEL.CLICKS portfolio</p>
+      <div class="qr-container">
+        <!-- Rendered QR code image reference -->
+        <img src="pixel.clicks_qr.jpg" alt="PIXEL.CLICKS QR Code">
+      </div>
+      <p style="font-weight: 600; letter-spacing: 1px;">PIXEL.CLICKS</p>
+      <button class="ios-btn" style="margin-top:15px; padding: 10px;" onclick="closeQRModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    let currentShoot = '';
+    const targetEmail = "pj1925110@gmail.com";
+    const targetPhone = "918320645326"; // International format for WhatsApp
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+      document.getElementById(`view-${tabName}`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const name = document.getElementById('login-name').value;
+      document.getElementById('book-name').value = name;
+      switchTab('gallery');
+    }
+
+    function selectShoot(shootTitle) {
+      currentShoot = shootTitle;
+      document.getElementById('selected-shoot-display').innerText = shootTitle;
+      switchTab('booking');
+    }
+
+    function handleBookingSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('book-name').value;
+      const details = document.getElementById('book-details').value;
+      const notes = document.getElementById('book-notes').value;
+
+      const subject = encodeURIComponent(`Shoot Booking: ${currentShoot} - ${name}`);
+      const body = encodeURIComponent(`Hello PIXEL.CLICKS,\n\nI would like to book a photography session.\n\nPackage: ${currentShoot}\nClient Name: ${name}\nDate & Location: ${details}\nNotes: ${notes}\n\nPlease get back to me!`);
+
+      // Open user's email client addressed directly to your email
+      window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+    }
+
+    function sendWhatsApp() {
+      const name = document.getElementById('book-name').value;
+      const details = document.getElementById('book-details').value;
+      const notes = document.getElementById('book-notes').value;
+
+      const message = encodeURIComponent(`Hi PIXEL.CLICKS!\nI'm interested in booking a shoot.\n\n*Shoot:* ${currentShoot}\n*Name:* ${name}\n*Date/Location:* ${details}\n*Notes:* ${notes}`);
+      
+      window.open(`https://wa.me/${targetPhone}?text=${message}`, '_blank');
+    }
+
+    function openQRModal() {
+      document.getElementById('qr-modal').classList.add('active');
+    }
+
+    function closeQRModal(e) {
+      document.getElementById('qr-modal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
